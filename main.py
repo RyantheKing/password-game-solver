@@ -51,5 +51,3 @@ def get_chess_move(driver):
     element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "chess-img")))
     index = element.get_attribute("src").split("puzzle")[-1].split(".")[0]
     return data.moves[int(index)]
-
-get_chess_move()
