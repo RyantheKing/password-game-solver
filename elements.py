@@ -55,7 +55,7 @@ def binary_search(arr: tuple[tuple[str, int]], query: int) -> tuple[str, int]:
     return arr[left - 1]  # always return the underestimate
 
 
-def required_elements(safes: tuple[tuple[str, int]], required_sum) -> list[tuple[str, int]]:
+def required_elements(required_sum) -> list[tuple[str, int]]:
     """
     Get the greedily shortest list of elements whose atomic numbers sum up to the requirement
 
@@ -63,6 +63,8 @@ def required_elements(safes: tuple[tuple[str, int]], required_sum) -> list[tuple
     :param required_sum: the sum that is required
     :return: the list of elements to use to get to that sum
     """
+
+    safes = safe_elements()
 
     elements = []
 
@@ -91,7 +93,7 @@ def test_elements():
     longest = 0
 
     for og_req in range(0, 201):
-        elements = required_elements(safes, og_req)
+        elements = required_elements(og_req)
 
         print(f'{og_req}: {elements}')
 
