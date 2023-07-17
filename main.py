@@ -30,6 +30,11 @@ def play_game():
     # remove fire
     driver.execute_script(password_to_html(password), box)
 
+    link = get_video(driver)
+    data.paul = '🐔'
+    password = generate_password(captcha, location, chess_move, link)
+    driver.execute_script(password_to_html(password), box)
+
 def password_to_html(password):
     # bold every vowel in password
     bolded = ""
@@ -40,7 +45,7 @@ def password_to_html(password):
             bolded += char
     return "arguments[0].innerHTML = '<p><span style=\"font-family: Monospace; font-size: 28px\">" + bolded + "</span></p>'"
 
-def generate_password(captcha='', location='', chess_move=''):
+def generate_password(captcha='', location='', chess_move='', link=''):
     # 5: digits must add to 25
     # 6: needs to include a month
     # 8: needs to include a sponsor
@@ -54,11 +59,10 @@ def generate_password(captcha='', location='', chess_move=''):
     leap_year = '0'  # mandatory
     atomic_number_requirement = 200
 
-    updated_password = data.paul + data.stronk + data.affirmation + leap_year + sponsor + month + thiry_five_mult + wordle + moon + captcha + location \
-                       + chess_move
+    updated_password = data.paul + data.stronk + data.affirmation + data.food + leap_year + sponsor + month + thiry_five_mult + wordle + moon + captcha + location \
+                       + chess_move + link
     updated_password += sum_25(updated_password)
-    updated_password += elements.required_elements_str(atomic_number_requirement
-                                                       - elements.password_element_sum(updated_password))
+    updated_password += elements.required_elements_str(atomic_number_requirement - elements.password_element_sum(updated_password))
 
     return updated_password
 
@@ -75,6 +79,7 @@ def sum_25(password):
     for char in password:
         if char.isdigit():
             le_sum += int(char)
+    print(le_sum)
     diff = 25 - le_sum
     return_str = ""
     while diff > 9:
@@ -120,5 +125,10 @@ def get_chess_move(driver):
     index = element.get_attribute("src").split("puzzle")[-1].split(".")[0]
     return data.moves[int(index)]
 
+def get_video(driver):
+    element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "youtube")))
+    text = element.get_attribute("innerText")
+    key = text.split(' minute')[0].split(' ')[-1] + ':' + f"{int(text.split(' second')[0].split(' ')[-1]):02d}"
+    return 'youtu.be/' + data.videos[key]
 
 play_game()
