@@ -6,25 +6,34 @@ from selenium.webdriver.support import expected_conditions as EC
 from datetime import date, datetime, timezone
 import pylunar
 import data
-import time
 
 def play_game():
     driver = launch_page()
     password = generate_password()
     box = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "ProseMirror")))
-    driver.execute_script("arguments[0].innerHTML = '<p><span style=\"font-family: Monospace; font-size: 28px\">"+ password +"</span></p>'", box)
+    driver.execute_script(password_to_html(password), box)
 
     captcha = get_captcha_answer(driver)
     password = generate_password(captcha)
-    driver.execute_script("arguments[0].innerHTML = '<p><span style=\"font-family: Monospace; font-size: 28px\">"+ password +"</span></p>'", box)
+    driver.execute_script(password_to_html(password), box)
 
     location = get_location(driver).lower()
     password = generate_password(captcha, location)
-    driver.execute_script("arguments[0].innerHTML = '<p><span style=\"font-family: Monospace; font-size: 28px\">"+ password +"</span></p>'", box)
+    driver.execute_script(password_to_html(password), box)
 
     chess_move = get_chess_move(driver)
     password = generate_password(captcha, location, chess_move)
-    driver.execute_script("arguments[0].innerHTML = '<p><span style=\"font-family: Monospace; font-size: 28px\">"+ password +"</span></p>'", box)
+    driver.execute_script(password_to_html(password), box)
+
+def password_to_html(password):
+    # bold every vowel in password
+    bolded = ""
+    for char in password:
+        if char in "aeiouAEIOU":
+            bolded += "<strong>" + char + "</strong>"
+        else:
+            bolded += char
+    return "arguments[0].innerHTML = '<p><span style=\"font-family: Monospace; font-size: 28px\">" + bolded + "</span></p>'"
 
 def generate_password(captcha='', location='', chess_move=''):
     # 5: digits must add to 25
@@ -39,10 +48,10 @@ def generate_password(captcha='', location='', chess_move=''):
     moon = get_moon_phase() # mandatory
     leap_year = '0'  # mandatory
 
-    updated_password = data.paul + sponsor + month + thiry_five_mult + wordle + moon + leap_year + captcha + location + chess_move
+    updated_password = data.paul + leap_year + sponsor + month + thiry_five_mult + wordle + moon + captcha + location + chess_move
     sum = sum_25(updated_password)
 
-    return data.paul + sponsor + month + thiry_five_mult + wordle + moon + leap_year + captcha + location + chess_move + sum
+    return data.paul + leap_year + sponsor + month + thiry_five_mult + wordle + moon + captcha + location + chess_move + sum
 
 def launch_page():
     driver = webdriver.Firefox()
