@@ -65,7 +65,7 @@ def binary_search(arr: tuple[tuple[str, int]], query: int) -> tuple[str, int]:
     return arr[left - 1]  # always return the underestimate
 
 
-def required_elements(required_sum) -> list[tuple[str, int]]:
+def required_elements(required_sum: int) -> list[tuple[str, int]]:
     """
     Get the greedily shortest list of elements whose atomic numbers sum up to the requirement
 
@@ -85,6 +85,14 @@ def required_elements(required_sum) -> list[tuple[str, int]]:
         elements.append(result)
 
     return elements
+
+
+def required_elements_str(required_sum: int) -> str:
+    """
+    Like required_elements, but returns the elements as one conjoined string
+    """
+
+    return ''.join(map(lambda element: element[0], required_elements(required_sum)))
 
 
 def generate_regex() -> re.Pattern:
