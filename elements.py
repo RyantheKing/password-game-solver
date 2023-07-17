@@ -1,4 +1,6 @@
 import csv
+import collections
+import re
 
 
 # noinspection PyTypeChecker
@@ -15,6 +17,14 @@ def load_elements_csv() -> tuple[tuple[str, int]]:
         reader = csv.DictReader(csv_file)
 
         return tuple((row['Symbol'], int(row['AtomicNumber'])) for row in reader)
+
+
+def symbol_map() -> dict[str, int]:
+    """
+    Generate a dict of symbols to atomic numbers
+    """
+
+    return dict(load_elements_csv())
 
 
 def safe_elements() -> tuple[tuple[str, int]]:
@@ -59,7 +69,6 @@ def required_elements(required_sum) -> list[tuple[str, int]]:
     """
     Get the greedily shortest list of elements whose atomic numbers sum up to the requirement
 
-    :param safes: the elements that are safe
     :param required_sum: the sum that is required
     :return: the list of elements to use to get to that sum
     """
@@ -76,6 +85,35 @@ def required_elements(required_sum) -> list[tuple[str, int]]:
         elements.append(result)
 
     return elements
+
+
+def generate_regex() -> re.Pattern:
+    """
+    Generate a regex to find all element symbols in the string, prioritizing 2-character symbols in case of overlap
+    """
+
+    elements = load_elements_csv()
+    deque = collections.deque()
+
+    for symbol, atomic_number in elements:
+        if len(symbol) == 1:
+            deque.append(symbol)
+        else:
+            deque.appendleft(symbol)
+
+    return re.compile('|'.join(deque), flags=re.U)
+
+
+def password_element_sum(password: str) -> int:
+    """
+    Get the sum of all element symbols in the given password
+    """
+
+    regex = generate_regex()
+    found = regex.findall(password)
+    mapping = symbol_map()
+
+    return sum(map(lambda symbol: mapping[symbol], found))
 
 
 def test_elements():
