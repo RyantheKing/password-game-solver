@@ -103,7 +103,9 @@ def generate_password(captcha='', location='', chess_move='', link='', color='')
     sum = sum_25(updated_password)
     updated_password += sum
     num_dots = length - password_length(updated_password)
-    updated_password += '@'*(num_dots//2) + '.'*(num_dots-num_dots//2)
+    for i in range((num_dots-1)//14+1):
+        updated_password += data.chars[i]*(num_dots-i*14 if num_dots//14 == i else 14)
+    # updated_password += '@'*(num_dots//2) + '.'*(num_dots-num_dots//2)
     # previous_attempt = updated_password
     # updated_password = old_password
     # while True:
