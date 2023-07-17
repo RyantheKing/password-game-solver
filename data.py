@@ -21,3 +21,9 @@ lunar_dict = {
 
 # defend the paul at all costs
 paul = '🥚'
+
+# stonk password
+stronk = '🏋️‍♂️🏋️‍♂️🏋️‍♂️'
+
+# love
+affirmation = 'iamloved'

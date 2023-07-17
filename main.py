@@ -27,11 +27,14 @@ def play_game():
     password = generate_password(captcha, location, chess_move)
     driver.execute_script(password_to_html(password), box)
 
+    # remove fire
+    driver.execute_script(password_to_html(password), box)
+
 def password_to_html(password):
     # bold every vowel in password
     bolded = ""
     for char in password:
-        if char in "aeiouAEIOU":
+        if char in "aeiouyAEIOUY":
             bolded += "<strong>" + char + "</strong>"
         else:
             bolded += char
@@ -51,7 +54,7 @@ def generate_password(captcha='', location='', chess_move=''):
     leap_year = '0'  # mandatory
     atomic_number_requirement = 200
 
-    updated_password = data.paul + leap_year + sponsor + month + thiry_five_mult + wordle + moon + captcha + location \
+    updated_password = data.paul + data.stronk + data.affirmation + leap_year + sponsor + month + thiry_five_mult + wordle + moon + captcha + location \
                        + chess_move
     updated_password += sum_25(updated_password)
     updated_password += elements.required_elements_str(atomic_number_requirement
