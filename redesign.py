@@ -203,7 +203,7 @@ def click_unused(driver, unused):
     letters = [letter for letter in element.find_elements(By.CLASS_NAME, "letter") if letter.text.lower() in unused]
     for letter in letters:
         letter.click()
-    element.find_element(By.CLASS_NAME, "sacrafice-btn").click()
+    (WebDriverWait(element,10).until(EC.element_to_be_clickable((By.CLASS_NAME, "sacrafice-btn")))).click()
 
 def launch_page():
     options = Options()
