@@ -202,6 +202,8 @@ def click_unused(driver, unused):
     element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "sacrafice-area")))
     letters = [letter for letter in element.find_elements(By.CLASS_NAME, "letter") if letter.text.lower() in unused]
     for letter in letters:
+        # wait for letter to be clickable
+        WebDriverWait(letter, 10).until(EC.element_to_be_clickable(letter))
         letter.click()
     (WebDriverWait(element,10).until(EC.element_to_be_clickable((By.CLASS_NAME, "sacrafice-btn")))).click()
 
@@ -219,7 +221,6 @@ def get_color(driver, sum_in):
     hex_string = '%02x%02x%02x' % tuple(nums)
     cur_time = datetime.now().strftime("%I%M")
     total = sum([int(num) for num in hex_string if num.isdigit()]) + sum_in + sum([int(num) for num in cur_time])
-    print(sum_in)
     if total > 25:
         refresh = WebDriverWait(element, 10).until(EC.element_to_be_clickable((By.CLASS_NAME, "refresh")))
     while total > 25:
@@ -228,7 +229,6 @@ def get_color(driver, sum_in):
         hex_string = '%02x%02x%02x' % tuple(nums)
         cur_time = datetime.now().strftime("%I%M")
         total = sum([int(num) for num in hex_string if num.isdigit()]) + sum_in + sum([int(num) for num in cur_time])
-        print(total)
 
     return '#' + hex_string
 
@@ -238,7 +238,8 @@ def get_time():
 
 def click_final_button(driver):
     element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "final-password")))
-    WebDriverWait(element, 10).until(EC.element_to_be_clickable((By.XPATH, "./child::*"))).click()
+    button = WebDriverWait(element, 10).until(EC.element_to_be_clickable((By.TAG_NAME, "button")))
+    button.click()
 
 def password_length(password):
     return len([char for char in password if ord(char) not in [65039, 8205, 9794]])
