@@ -62,7 +62,7 @@ def play_game():
     click_unused(driver, unused)
 
     # get color to make final button available
-    color = get_color(driver, sum([int(num) for num in old_password if num.isdigit()]))
+    color = get_color(driver, sum([int(num) for num in old_password if num.isdigit()]), unused)
     password = generate_password(state=5, captcha=captcha, location=location, chess_move=chess_move, link=link, color=color)
     password += sum_25(password) + elements.required_elements_str(200 - elements.password_element_sum(password))
     password += '.'*(101-password_length(password))
@@ -214,16 +214,17 @@ def launch_page():
     driver.get("https://neal.fun/password-game/")
     return driver
 
-def get_color(driver, sum_in):
+def get_color(driver, sum_in, unused_letters):
     element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "rand-color")))
     nums = [int(num) for num in element.get_attribute("style").split("(")[-1][0:-2].split(", ")]
+    banned_letters = set(unused_letters)
     # convert rgb (nums) to hex
     hex_string = '%02x%02x%02x' % tuple(nums)
     cur_time = datetime.now().strftime("%I%M")
     total = sum([int(num) for num in hex_string if num.isdigit()]) + sum_in + sum([int(num) for num in cur_time])
-    if total > 25:
+    if total > 25 or set(hex_string) & banned_letters:
         refresh = WebDriverWait(element, 10).until(EC.element_to_be_clickable((By.CLASS_NAME, "refresh")))
-    while total > 25:
+    while total > 25 or set(hex_string) & banned_letters:
         refresh.click()
         nums = [int(num) for num in element.get_attribute("style").split("(")[-1][0:-2].split(", ")]
         hex_string = '%02x%02x%02x' % tuple(nums)
