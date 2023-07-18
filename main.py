@@ -14,6 +14,7 @@ def play_game():
     driver = launch_page()
     password = generate_password()
     box = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "ProseMirror")))
+
     driver.execute_script(password_to_html(password), box)
 
     captcha = get_captcha_answer(driver)
@@ -85,9 +86,17 @@ def generate_password(captcha='', location='', chess_move='', link='', color='')
     thiry_five_mult = 'XXXV'  # mandatory
     wordle = get_wordle_answer()  # mandatory
     cur_time = get_time()  # mandatory
-    moon = '🌑🌒🌓🌔🌕🌖🌗🌘' #get_moon_phase()  # mandatory
+    moon = '🌑🌒🌓🌔🌕🌖🌗🌘' # mandatory
     leap_year = '0'  # mandatory
     atomic_number_requirement = 200
+
+    # numbers:
+    # 1: current time (min: 0, max: 24 (19:59))
+    # 2: catpcha (avoidable)
+    # 3: chess move (min: 1, max: 8)
+    # 4: youtube link (potentially avoidable but very difficult)
+    # 5: color (avoidable)
+    # 6: password length (prime number) (min: 2, max: 17)
 
     updated_password = data.paul + data.stronk + data.affirmation + data.food + leap_year + sponsor + month + thiry_five_mult + wordle + cur_time + moon + captcha + location \
                        + chess_move + link + color
@@ -228,7 +237,7 @@ def get_color(driver):
 
 def get_time():
     # gets the time in HH:MM format
-    return datetime.now().strftime("%H:%M")
+    return datetime.now().strftime("%I:%M")
 
 def click_final_button(driver):
     element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "final-password")))

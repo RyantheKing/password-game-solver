@@ -24,6 +24,7 @@ paul = '🥚'
 
 # food for paul
 food = '🐛🐛🐛'
+smol_food = '🐛'
 
 # stonk password
 stronk = '🏋️‍♂️🏋️‍♂️🏋️‍♂️'
