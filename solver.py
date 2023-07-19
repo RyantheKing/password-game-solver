@@ -7,7 +7,10 @@ from collections import defaultdict
 
 def birth_paul():
     '''
-    Therefore the Lord himself will give you a sign: The virgin will conceive and give birth to a son, and will call him Paul.  (change the egg in the string to a chicken)
+    And he called to him two of the centurions and said,
+    “Get two hundred soldiers ready by the third hour of the night to proceed to Caesarea, with seventy horsemen and two hundred spearmen.”
+    They were also to provide mounts to put Paul on and bring him safely to Felix the governor.
+    (change the egg in the string to a chicken)
     '''
     data.paul = '🐔'
 
