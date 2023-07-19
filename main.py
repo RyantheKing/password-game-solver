@@ -13,6 +13,9 @@ import solver
 # 7: pre-final
 
 def play_game():
+    """
+    Attempts to complete the password game
+    """
     password = solver.generate_password(0)
     
     # initial password to obtain captcha

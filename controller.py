@@ -10,16 +10,26 @@ import solver
 import re
 
 def get_text_box():
+    """
+    Get the WebElement object to type in
+    :return: A WebElement object containing a text box
+    """
     return WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "ProseMirror")))
 
 def set_final_text_box():
+    """Changes the text box to the final text box"""
     global box
     box = driver.find_elements(By.CLASS_NAME, "ProseMirror")[-1]
 
-def type_password_html(html):
+def type_password_html(html: str):
+    """Types the password into the text box using javascript"""
     driver.execute_script(html, box)
 
-def get_captcha_answer():
+def get_captcha_answer() -> str:
+    """
+    Gets the captcha string
+    :return: The captcha string
+    """
     # explicit wait
     wrapper = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "captcha-wrapper")))
     element = wrapper.find_element(By.CLASS_NAME, "captcha-img")
@@ -34,26 +44,42 @@ def get_captcha_answer():
         total = sum([int(num) for num in answer if num.isdigit()])
     return answer
 
-def get_location():
+def get_location() -> str:
+    """
+    Gets the location from the geoguesser game
+    :return: The country name
+    """
     element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "geo-wrapper")))
     # get child of element
     link = element.find_element(By.XPATH, "./child::*").get_attribute("src")
     # search for link in maps.jsonc and return location
     return data.locations[link]
 
-def get_chess_move():
+def get_chess_move() -> str:
+    """
+    Gets the answer to the chess puzzle in algebraic notation
+    :return: The answer to the chess puzzle in algebraic notation
+    """
     element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "chess-img")))
     index = element.get_attribute("src").split("puzzle")[-1].split(".")[0]
     return data.moves[int(index)]
 
-def get_video():
+def get_video() -> str:
+    """
+    Gets the video link from the youtube video
+    :return: The video link
+    """
     element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "youtube")))
     text = element.get_attribute("innerText")[10:]
     res = [re.sub('[^0-9]','', half) for half in text.split('minute')]
     key = res[0] + ':' + f"{(res[1] if res[1] else '00'):02s}"
     return 'youtu.be/' + data.videos[key]
 
-def click_unused(unused):
+def click_unused(unused: str):
+    """
+    Clicks the letters to sacrifice
+    :param unused: The letters to sacrifice (2-letter string)
+    """
     element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "sacrafice-area")))
     letters = [letter for letter in element.find_elements(By.CLASS_NAME, "letter") if letter.text.lower() in unused]
     for letter in letters:
@@ -62,7 +88,13 @@ def click_unused(unused):
         letter.click()
     WebDriverWait(element,10).until(EC.element_to_be_clickable((By.CLASS_NAME, "sacrafice-btn"))).click()
 
-def get_color(old_password, unused_letters):
+def get_color(old_password: str, unused_letters: str) -> str:
+    """
+    Gets the hex code of the color shown (will reload the color until an appropriate color is shown)
+    :param old_password: The password before the color hex is added
+    :param unused_letters: The letters that cannot be in the hex code
+    :return: The hex code of the color shown
+    """
     sum_in = solver.digit_sum(old_password)
     element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "rand-color")))
     nums = [int(num) for num in element.get_attribute("style").split("(")[-1][0:-2].split(", ")]
@@ -82,6 +114,9 @@ def get_color(old_password, unused_letters):
     return '#' + hex_string
 
 def click_final_button():
+    """
+    Clicks the comfirmation button
+    """
     element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "final-password")))
     button = WebDriverWait(element, 10).until(EC.element_to_be_clickable((By.TAG_NAME, "button")))
     button.click()

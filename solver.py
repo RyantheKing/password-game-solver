@@ -6,27 +6,41 @@ from datetime import datetime
 from collections import defaultdict
 
 def birth_paul():
+    '''
+    Therefore the Lord himself will give you a sign: The virgin will conceive and give birth to a son, and will call him Paul.  (change the egg in the string to a chicken)
+    '''
     data.paul = '🐔'
 
-def digit_sum(password : str) -> int:
+def digit_sum(password : str):
+    """
+    Get the sum of all digits in the given password
+    :param password: The password to sum
+    :return: The sum of all digits in the password
+    """
     return sum([int(num) for num in password if num.isdigit()])
 
-def get_wordle_answer():
+def get_wordle_answer() -> str:
+    """
+    API call to get the wordle answer
+    :return: The wordle answer
+    """
     # uses requests library
     response = requests.get("https://neal.fun/api/password-game/wordle?date=" + datetime.today().strftime("%Y-%m-%d"))
     return response.json()['answer']
 
 def get_time():
-    # gets the time in HH:MM format
+    """
+    Gets the time in HH:MM format
+    """
     return datetime.now().strftime("%I:%M")
 
-def sum_25(password):
-    # sum all the digits in the string and return the difference from 25
-    le_sum = 0
-    for char in password:
-        if char.isdigit():
-            le_sum += int(char)
-    diff = 25 - le_sum
+def sum_25(password: str) -> str:
+    """
+    Print out a string to compensate for the missing digits in the password
+    :param password: The password with digits in it to compensate for
+    :return: The string to add to the password
+    """
+    diff = 25 - digit_sum(password)
     return_str = ""
     while diff > 9:
         return_str += "9"
@@ -34,22 +48,51 @@ def sum_25(password):
     return_str += str(diff)
     return return_str
 
-def get_element_string(password):
+def get_element_string(password: str) -> str:
+    """
+    Gets the string of elements to add to the password to make a total atomic number of 200
+    :param password: The password containing pre-existing elements
+    :return: The string of elements to add to the password
+    """
     return elements.required_elements_str(200 - elements.password_element_sum(password))
 
-def dot_string(password):
+def dot_string(password: str) -> str:
+    """
+    Gets the string of dots to add to the password to make a total length of 101
+    :param password: The password
+    :return: The string of dots to add to the password
+    """
     return '.'*(101-password_length(password))
 
-def password_length(password):
+def password_length(password: str) -> int:
+    """
+    Gets the length of the password without the invisible characters. DO NOT USE 'len(password)'
+    :param password: The password
+    :return: The length of the password without the invisible characters
+    """
     return len([char for char in password if ord(char) not in [65039, 8205, 9794]])
 
-def get_unused_letters(password):
+def get_unused_letters(password: str) -> str:
+    """
+    Get the letters unused in the password
+    :param password: The password
+    :return: The letters not used in the password
+    """
     alphabet_set = set('abcdefghijklmnopqrstuvwxyz')
     password_set = set(password.lower())
     return ''.join(sorted(alphabet_set - password_set))
 
 def generate_password(state=0, captcha='', location='', chess_move='', link='', color=''):
-    # generate password based on current state
+    """
+    Generates the password for the given state and strings
+    :param state: The state of the password (0-5)
+    :param captcha: The captcha answer
+    :param location: The country name from geoguesser
+    :param chess_move: The chess move in algebraic notation
+    :param link: The youtube link
+    :param color: The hex code of the color
+    :return: The password
+    """
     match state:
         case 0:
              #data.paul + data.stronk + data.affirmation + data.smol_food +
@@ -66,6 +109,12 @@ def generate_password(state=0, captcha='', location='', chess_move='', link='', 
             return data.paul + data.smol_food + data.stronk + data.affirmation + '🌑🌒🌓🌔🌕🌖🌗🌘' + '101' + 'may' + 'shell' + '0' + 'XXXV' + captcha + get_wordle_answer() + get_time() + location + chess_move + link + color
         
 def password_to_html(state=0, password=''):
+    """
+    Converts the password to html
+    :param state: The state of the password (0-5)
+    :param password: The password
+    :return: The html string
+    """
     match state:
         case 0:
             return "arguments[0].innerHTML = '<p>" + password + "</p>'"
