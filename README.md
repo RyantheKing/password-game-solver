@@ -34,5 +34,4 @@ The bot will occasionally fail in scenarios where a solve is impossible. For exa
 ## Credits
 Big thanks to not a cat ([GitHub page here](https://github.com/the-non-feline)) for his help with the code and testing of the project \
 YouTube video link database, chess answer database, and google maps answer database all by pog5 ([GitHub page here](https://github.com/pog5/)) \
-And thanks to [Neal Agarwal](https://nealagarwal.me/) for the game itself. \
-Play The Password Game: https://neal.fun/password-game/
+And thanks to [Neal Agarwal](https://nealagarwal.me/) for the game itself.
