@@ -73,7 +73,7 @@ def get_video() -> str:
     element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "youtube")))
     text = element.get_attribute("innerText")[10:]
     res = [re.sub('[^0-9]','', half) for half in text.split('minute')]
-    key = res[0] + ':' + f"{(res[1] if res[1] else '00'):02s}"
+    key = res[0] + ':' + f"{(res[1] if res[1] else '00'):0>2}"
     return 'youtu.be/' + data.videos[key]
 
 def click_unused(unused: str):
