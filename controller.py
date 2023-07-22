@@ -5,6 +5,7 @@ from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.common import exceptions
 import data
 import solver
 import re
@@ -39,7 +40,7 @@ def get_captcha_answer() -> str:
     total = sum([int(num) for num in answer if num.isdigit()])
     refresh = WebDriverWait(wrapper, 10).until(EC.element_to_be_clickable((By.CLASS_NAME, "captcha-refresh")))
     while total > 0:
-        refresh.click()
+        click_button(refresh)
         answer = element.get_attribute("src").split("/")[-1].split(".")[0]
         total = sum([int(num) for num in answer if num.isdigit()])
     return answer
@@ -85,8 +86,8 @@ def click_unused(unused: str):
     for letter in letters:
         # wait for letter to be clickable
         WebDriverWait(letter, 10).until(EC.element_to_be_clickable(letter))
-        letter.click()
-    WebDriverWait(element,10).until(EC.element_to_be_clickable((By.CLASS_NAME, "sacrafice-btn"))).click()
+        click_button(letter)
+    click_button(WebDriverWait(element,10).until(EC.element_to_be_clickable((By.CLASS_NAME, "sacrafice-btn"))))
 
 def get_color(old_password: str, unused_letters: str) -> str:
     """
@@ -106,7 +107,7 @@ def get_color(old_password: str, unused_letters: str) -> str:
     if total > 25 or set(hex_string) & banned_letters:
         refresh = WebDriverWait(element, 10).until(EC.element_to_be_clickable((By.CLASS_NAME, "refresh")))
     while total > 25 or set(hex_string) & banned_letters:
-        refresh.click()
+        click_button(refresh)
         nums = [int(num) for num in element.get_attribute("style").split("(")[-1][0:-2].split(", ")]
         hex_string = '%02x%02x%02x' % tuple(nums)
         cur_time = datetime.now().strftime("%I%M")
@@ -119,7 +120,19 @@ def click_final_button():
     """
     element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "final-password")))
     button = WebDriverWait(element, 10).until(EC.element_to_be_clickable((By.TAG_NAME, "button")))
-    button.click()
+    click_button(button)
+
+def click_button(button):
+    """
+    Clicks the provided button
+    """
+    while True:
+        try:
+            button.click()
+        except exceptions.ElementClickInterceptedException:
+            pass
+        else:
+            break
 
 options = Options()
 options.binary_location = r'C:\Program Files\Mozilla Firefox\firefox.exe'
