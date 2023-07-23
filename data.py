@@ -32,5 +32,17 @@ stronk = '🏋️‍♂️🏋️‍♂️🏋️‍♂️'
 # love
 affirmation = 'iamloved'
 
+# pylunar phase name corresponding to the emoji
+lunar_dict = {
+    'NEW_MOON': '🌑',
+    'WAXING_CRESCENT': '🌒',
+    'FIRST_QUARTER': '🌓',
+    'WAXING_GIBBOUS': '🌔',
+    'FULL_MOON': '🌕',
+    'WANING_GIBBOUS': '🌖',
+    'LAST_QUARTER': '🌗',
+    'WANING_CRESCENT': '🌘'
+}
+
 #list of font sizes
 font_sizes = [None, 16, 25, 28, 32, 36, 42, 49, 64, 81, 12, 9, 4, 1, 0]

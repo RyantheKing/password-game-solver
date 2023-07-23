@@ -3,6 +3,8 @@ import data
 import elements
 import requests
 from datetime import datetime
+import pytz
+import pylunar
 from collections import defaultdict
 
 def birth_paul():
@@ -65,7 +67,8 @@ def dot_string(password: str) -> str:
     :param password: The password
     :return: The string of dots to add to the password
     """
-    return '.'*(101-password_length(password))
+    length = 101-password_length(password)
+    return '.,'*(length//2) + '.'*(length%2)
 
 def password_length(password: str) -> int:
     """
@@ -99,17 +102,17 @@ def generate_password(state=0, captcha='', location='', chess_move='', link='', 
     match state:
         case 0:
              #data.paul + data.stronk + data.affirmation + data.smol_food +
-            return '101' + 'may' + 'XXXV' + 'sHell' + '🌑🌒🌓🌔🌕🌖🌗🌘'
+            return '101' + 'may' + 'XXXV' + 'sHell' + get_moon_phase()
         case 1:
-            return '101' + 'may' + 'XXXV' + 'sHell' + '🌑🌒🌓🌔🌕🌖🌗🌘' + captcha + get_wordle_answer()
+            return '101' + 'may' + 'XXXV' + 'sHell' + get_moon_phase() + captcha + get_wordle_answer()
         case 2:
-            return '101' + 'may' + '0' + 'XXXV' + 'sHell' + '🌑🌒🌓🌔🌕🌖🌗🌘' + captcha + get_wordle_answer() + location
+            return '101' + 'may' + '0' + 'XXXV' + 'sHell' + get_moon_phase() + captcha + get_wordle_answer() + location
         case 3:
-            return data.paul + data.smol_food + data.stronk + '101' + 'may' + '0' + data.affirmation + 'XXXV' + 'shell' + '🌑🌒🌓🌔🌕🌖🌗🌘' + captcha + get_wordle_answer() + location + chess_move
+            return data.paul + data.smol_food + data.stronk + '101' + 'may' + '0' + data.affirmation + 'XXXV' + 'shell' + get_moon_phase() + captcha + get_wordle_answer() + location + chess_move
         case 4:
-            return data.paul + data.smol_food + data.stronk + data.affirmation + '🌑🌒🌓🌔🌕🌖🌗🌘' + '101' + 'may' + 'shell' + '0' + 'XXXV' + captcha + get_wordle_answer() + location + chess_move + link
+            return data.paul + data.smol_food + data.stronk + data.affirmation + get_moon_phase() + '101' + 'may' + 'shell' + '0' + 'XXXV' + captcha + get_wordle_answer() + location + chess_move + link
         case 5:
-            return data.paul + data.smol_food + data.stronk + data.affirmation + '🌑🌒🌓🌔🌕🌖🌗🌘' + '101' + 'may' + 'shell' + '0' + 'XXXV' + captcha + get_wordle_answer() + get_time() + location + chess_move + link + color
+            return data.paul + data.smol_food + data.stronk + data.affirmation + get_moon_phase() + '101' + 'may' + 'shell' + '0' + 'XXXV' + captcha + get_wordle_answer() + get_time() + location + chess_move + link + color
         
 def password_to_html(state=0, password=''):
     """
@@ -136,18 +139,21 @@ def password_to_html(state=0, password=''):
         case 4:
             modified = ""
             modified += "<span style=\"font-family: Wingdings; font-size: 28px\">"
+            count = 0
             for char in password:
                 if char in "aeiouyAEIOUY":
                     modified += "<strong>" + char + "</strong>"
                 else:
                     modified += "<em>" + char + "</em>"
-                if char == '🌘':
+                if count == 30:
                     modified += "</span>"
+                count += 1
             return "arguments[0].innerHTML = '<p>" + modified + "</p>'"
         case 5:
                 default_font = 'Wingdings'
                 modified = ""
                 used_letters = defaultdict(int)
+                count = 0
                 for char in password:
                     used_letters[char.lower()] += 1
                     if ord(char) in [65039, 8205, 9794]:
@@ -163,6 +169,15 @@ def password_to_html(state=0, password=''):
                     else:
                         modified += "<em>" + char + "</em>"
                     modified += "</span>"
-                    if char == '🌘':
+                    if count == 30:
                         default_font = 'Monospace'
+                    count += 1
                 return "arguments[0].innerHTML = '<p>" + modified + "</p>'"
+        
+def get_moon_phase():
+    mi = pylunar.MoonInfo((0,0,0),(0,0,0))
+    EASTERN = pytz.timezone('US/Eastern')
+    eastern_time = datetime.now(tz=EASTERN)
+    datetime_tuple = (eastern_time.year, eastern_time.month, eastern_time.day, 0, 0, 0)
+    mi.update(datetime_tuple)
+    return data.lunar_dict[mi.phase_name()]
