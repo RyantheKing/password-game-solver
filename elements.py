@@ -25,6 +25,7 @@ class Element:
         """
         Determine whether this element is safe (no roman numerals and no banned characters)
 
+        :param banned_chars: the set of banned characters
         :return: whether the number is safe
         """
 
