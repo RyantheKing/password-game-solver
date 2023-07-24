@@ -9,6 +9,7 @@ from selenium.common import exceptions
 import data
 import solver
 import re
+from time import sleep
 
 def get_text_box():
     """
@@ -81,6 +82,7 @@ def click_unused(unused: str):
     Clicks the letters to sacrifice
     :param unused: The letters to sacrifice (2-letter string)
     """
+    print(unused)
     element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "sacrafice-area")))
     letters = [letter for letter in element.find_elements(By.CLASS_NAME, "letter") if letter.text.lower() in unused]
     for letter in letters:
@@ -106,10 +108,13 @@ def get_color(old_password: str, unused_letters: str) -> str:
     total = sum([int(num) for num in hex_string if num.isdigit()]) + sum_in + sum([int(num) for num in cur_time])
     if total > 25 or set(hex_string) & banned_letters:
         refresh = WebDriverWait(element, 10).until(EC.element_to_be_clickable((By.CLASS_NAME, "refresh")))
+    else:
+        sleep(0.1)
     while total > 25 or set(hex_string) & banned_letters:
         click_button(refresh)
         nums = [int(num) for num in element.get_attribute("style").split("(")[-1][0:-2].split(", ")]
         hex_string = '%02x%02x%02x' % tuple(nums)
+        print(hex_string)
         cur_time = datetime.now().strftime("%I%M")
         total = sum([int(num) for num in hex_string if num.isdigit()]) + sum_in + sum([int(num) for num in cur_time])
     return '#' + hex_string
