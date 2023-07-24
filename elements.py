@@ -92,7 +92,7 @@ def required_elements(required_sum: int, banned_chars: str) -> list[Element]:
     Get the greedily shortest list of elements whose atomic numbers sum up to the requirement
 
     :param required_sum: the sum that is required
-    :param banned_chars: the banned characters
+    :param banned_chars: the banned characters; NOT case-sensitive
     :return: the list of elements to use to get to that sum
     """
 
@@ -120,7 +120,7 @@ def required_elements_str(required_sum: int, banned_chars: str) -> str:
     Like required_elements, but returns the elements as one conjoined string
 
     :param required_sum: the sum that is required
-    :param banned_chars: the banned characters
+    :param banned_chars: the banned characters; NOT case-sensitive
     :return: the combined string of element symbols to use to get to that sum
     """
 
