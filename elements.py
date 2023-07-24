@@ -166,6 +166,11 @@ def test_elements():
     testing function
     """
 
+    print(generate_regex())
+
+    assert(len(Element.all_elements) == 118)
+    assert(len(Element.symbols_to_atomic_nums) == 118)
+
     banned = 'oge'
 
     safes = Element.safe_elements(set(banned.lower()) | set(banned.upper()))
