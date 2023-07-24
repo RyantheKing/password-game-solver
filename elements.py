@@ -2,66 +2,44 @@ import csv
 import collections
 import re
 
-ROMAN_NUMERALS = set('IVXLCDM')
+
+# noinspection PyTypeChecker
+def load_elements_csv() -> tuple[tuple[str, int]]:
+    """
+    Load the CSV of periodic table element data
+
+    :return: tuple of 2-tuples, each one containing the atomic symbol and atomic number, in that order
+    """
+
+    FILENAME = 'periodic_table.csv'
+
+    with open(FILENAME) as csv_file:
+        reader = csv.DictReader(csv_file)
+
+        return tuple((row['Symbol'], int(row['AtomicNumber'])) for row in reader)
 
 
-class Element:
-    all_elements: list['Element'] = []
-    symbols_to_atomic_nums: dict[str, int] = {}
+def symbol_map() -> dict[str, int]:
+    """
+    Generate a dict of symbols to atomic numbers
+    """
 
-    def __init__(self, element_dict: dict[str, str]):
-        """
-        :param element_dict: the dict representing the element
-        """
-
-        self.symbol = element_dict['Symbol']
-        self.characters = set(self.symbol)
-        self.atomic_number = int(element_dict['AtomicNumber'])
-
-        self.all_elements.append(self)
-        self.symbols_to_atomic_nums[self.symbol] = self.atomic_number
-
-    def safe(self, banned_chars: set[str]) -> bool:
-        """
-        Determine whether this element is safe (no roman numerals and no banned characters)
-
-        :return: whether the number is safe
-        """
-
-        return self.symbol[0] not in ROMAN_NUMERALS and not (self.characters & banned_chars)
-
-    @classmethod
-    def load_elements_csv(cls):
-        """
-        Load the CSV of periodic table element data
-        """
-
-        FILENAME = 'periodic_table.csv'
-
-        with open(FILENAME) as csv_file:
-            reader = csv.DictReader(csv_file)
-
-            for row in reader:
-                cls(row)
-
-    @classmethod
-    def safe_elements(cls, banned_chars: set[str]) -> tuple['Element']:
-        """
-        Load the CSV and filter out elements that start with a Roman numeral
-
-        :param banned_chars: the set of characters that cannot be used
-        :return: a tuple of elements that are safe
-        """
-
-        return tuple(filter(lambda element: element.safe(banned_chars), cls.all_elements))
-
-    def __str__(self):
-        return f'{self.symbol} {self.atomic_number}'
-
-    __repr__ = __str__
+    return dict(load_elements_csv())
 
 
-def binary_search(arr: tuple[Element], query: int) -> Element:
+def safe_elements() -> tuple[tuple[str, int]]:
+    """
+    Load the CSV and filter out elements that start with a Roman numeral
+
+    :return: the same thing as load_elements_csv but fewer elements
+    """
+
+    ROMAN_NUMERALS = set('IVXLCDM')
+
+    return tuple(filter(lambda element: element[0][0] not in ROMAN_NUMERALS, load_elements_csv()))
+
+
+def binary_search(arr: tuple[tuple[str, int]], query: int) -> tuple[str, int]:
     """
     Binary search to find le needed element
 
@@ -77,9 +55,9 @@ def binary_search(arr: tuple[Element], query: int) -> Element:
         mid = (left + right) // 2
         element = arr[mid]
 
-        if element.atomic_number == query:
+        if element[1] == query:
             return element
-        elif element.atomic_number < query:
+        elif element[1] < query:
             left = mid + 1
         else:
             right = mid
@@ -87,35 +65,34 @@ def binary_search(arr: tuple[Element], query: int) -> Element:
     return arr[left - 1]  # always return the underestimate
 
 
-def required_elements(required_sum: int, banned_chars: str) -> list[Element]:
+def required_elements(required_sum: int) -> list[tuple[str, int]]:
     """
     Get the greedily shortest list of elements whose atomic numbers sum up to the requirement
 
     :param required_sum: the sum that is required
-    :param banned_chars: the banned characters
     :return: the list of elements to use to get to that sum
     """
 
-    safes = Element.safe_elements(set(banned_chars.lower()) | set(banned_chars.upper()))
+    safes = safe_elements()
 
     elements = []
 
     while required_sum > 0:
-        result = binary_search(safes, required_sum)
+        symbol, atom_num = result = binary_search(safes, required_sum)
 
-        required_sum -= result.atomic_number
+        required_sum -= atom_num
 
         elements.append(result)
 
     return elements
 
 
-def required_elements_str(required_sum: int, banned_chars: str) -> str:
+def required_elements_str(required_sum: int) -> str:
     """
     Like required_elements, but returns the elements as one conjoined string
     """
 
-    return ''.join(map(lambda element: element.symbol, required_elements(required_sum, banned_chars)))
+    return ''.join(map(lambda element: element[0], required_elements(required_sum)))
 
 
 def generate_regex() -> re.Pattern:
@@ -123,14 +100,14 @@ def generate_regex() -> re.Pattern:
     Generate a regex to find all element symbols in the string, prioritizing 2-character symbols in case of overlap
     """
 
-    elements = Element.all_elements
+    elements = load_elements_csv()
     deque = collections.deque()
 
-    for element in elements:
-        if len(element.symbol) == 1:
-            deque.append(element.symbol)
+    for symbol, atomic_number in elements:
+        if len(symbol) == 1:
+            deque.append(symbol)
         else:
-            deque.appendleft(element.symbol)
+            deque.appendleft(symbol)
 
     return re.compile('|'.join(deque), flags=re.U)
 
@@ -142,7 +119,7 @@ def password_element_sum(password: str) -> int:
 
     regex = generate_regex()
     found = regex.findall(password)
-    mapping = Element.symbols_to_atomic_nums
+    mapping = symbol_map()
 
     return sum(map(lambda symbol: mapping[symbol], found))
 
@@ -152,9 +129,7 @@ def test_elements():
     testing function
     """
 
-    banned = 'og'
-
-    safes = Element.safe_elements(set(banned.lower()) | set(banned.upper()))
+    safes = safe_elements()
 
     for safe in safes:
         print(safe)
@@ -164,11 +139,11 @@ def test_elements():
     longest = 0
 
     for og_req in range(0, 201):
-        elements = required_elements(og_req, banned)
+        elements = required_elements(og_req)
 
         print(f'{og_req}: {elements}')
 
-        assert (sum(map(lambda e: e.atomic_number, elements)) == og_req)
+        assert (sum(map(lambda e: e[1], elements)) == og_req)
 
         if len(elements) > longest:
             longest = len(elements)
@@ -176,5 +151,4 @@ def test_elements():
     print()
     print(longest)
 
-
-Element.load_elements_csv()
+# test_elements()
