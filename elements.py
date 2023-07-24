@@ -61,30 +61,30 @@ class Element:
     __repr__ = __str__
 
 
-def binary_search(arr: tuple[Element], query: int, right: int) -> int:
+def binary_search(arr: tuple[Element], query: int) -> Element:
     """
     Binary search to find le needed element
 
     :param arr: the array (actually a tuple) of elements
     :param query: the atomic number to find
-    :param right: the right edge (not included)
     :return: the element if an exact match is found, the largest underestimate if one wasn't found
     """
 
     left = 0
+    right = len(arr)
 
     while left < right:
         mid = (left + right) // 2
         element = arr[mid]
 
         if element.atomic_number == query:
-            return mid
+            return element
         elif element.atomic_number < query:
             left = mid + 1
         else:
             right = mid
 
-    return left - 1  # always return the underestimate
+    return arr[left - 1]  # always return the underestimate
 
 
 def required_elements(required_sum: int, banned_chars: str) -> list[Element]:
@@ -100,17 +100,12 @@ def required_elements(required_sum: int, banned_chars: str) -> list[Element]:
 
     elements = []
 
-    right = len(safes)
-
     while required_sum > 0:
-        result_index = binary_search(safes, required_sum, right)
-        result = safes[result_index]
+        result = binary_search(safes, required_sum)
 
         required_sum -= result.atomic_number
 
         elements.append(result)
-
-        right = result_index + 1
 
     return elements
 
@@ -157,7 +152,7 @@ def test_elements():
     testing function
     """
 
-    banned = 'oge'
+    banned = 'og'
 
     safes = Element.safe_elements(set(banned.lower()) | set(banned.upper()))
 
