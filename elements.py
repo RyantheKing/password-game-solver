@@ -68,7 +68,7 @@ def binary_search(arr: tuple[Element], query: int, right: int) -> int:
     :param arr: the array (actually a tuple) of elements
     :param query: the atomic number to find
     :param right: the right edge (not included)
-    :return: the element if an exact match is found, the largest underestimate if one wasn't found
+    :return: the element index if an exact match is found, the largest underestimate if one wasn't found
     """
 
     left = 0
@@ -118,6 +118,10 @@ def required_elements(required_sum: int, banned_chars: str) -> list[Element]:
 def required_elements_str(required_sum: int, banned_chars: str) -> str:
     """
     Like required_elements, but returns the elements as one conjoined string
+
+    :param required_sum: the sum that is required
+    :param banned_chars: the banned characters
+    :return: the combined string of element symbols to use to get to that sum
     """
 
     return ''.join(map(lambda element: element.symbol, required_elements(required_sum, banned_chars)))
@@ -126,6 +130,8 @@ def required_elements_str(required_sum: int, banned_chars: str) -> str:
 def generate_regex() -> re.Pattern:
     """
     Generate a regex to find all element symbols in the string, prioritizing 2-character symbols in case of overlap
+
+    :return: the regex
     """
 
     elements = Element.all_elements
@@ -143,6 +149,8 @@ def generate_regex() -> re.Pattern:
 def password_element_sum(password: str) -> int:
     """
     Get the sum of all element symbols in the given password
+
+    :return: the sum
     """
 
     regex = generate_regex()
