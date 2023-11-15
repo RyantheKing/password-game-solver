@@ -88,7 +88,7 @@ def binary_search(arr: tuple[Element], query: int, right: int) -> int:
     return left - 1  # always return the underestimate
 
 
-def required_elements(required_sum: int, banned_chars: str) -> list[Element]:
+def required_elements(required_sum: int, banned_chars: str = '') -> tuple[Element]:
     """
     Get the greedily shortest list of elements whose atomic numbers sum up to the requirement
 
@@ -99,24 +99,42 @@ def required_elements(required_sum: int, banned_chars: str) -> list[Element]:
 
     safes = Element.safe_elements(set(banned_chars.lower()) | set(banned_chars.upper()))
 
-    elements = []
-
-    right = len(safes)
-
-    while required_sum > 0:
-        result_index = binary_search(safes, required_sum, right)
-        result = safes[result_index]
-
-        required_sum -= result.atomic_number
-
-        elements.append(result)
-
-        right = result_index + 1
-
-    return elements
+    return coinChange(safes, required_sum)
 
 
-def required_elements_str(required_sum: int, banned_chars: str) -> str:
+def coinChange(elements: tuple[Element], amount: int):
+    cache = [()]
+    largest_atomic_num = max(map(lambda e: e.atomic_number, elements))
+    end = 0
+
+    for target in range(1, amount + 1):
+        minimum = None
+        minimum_element = None
+
+        for element in elements:
+            # deque size is limited to the value of the largest coin, cuz that's the farthest we have to look back
+            storage_location = (end - element.atomic_number) % len(cache)
+
+            if element.atomic_number <= target and cache[storage_location] is not None and (
+                    minimum is None or len(cache[storage_location]) < len(minimum)):
+                minimum = cache[storage_location]
+                minimum_element = element
+
+        new_val = minimum + (minimum_element,) if minimum is not None else None
+
+        # limit the size of the deque to the value of the largest coin
+        if target >= largest_atomic_num:
+            cache[end] = new_val
+            end = (end + 1) % len(cache)
+        else:
+            cache.append(new_val)
+
+    last_combo = cache[(end - 1) % len(cache)]
+
+    return last_combo
+
+
+def required_elements_str(required_sum: int, banned_chars: str = '') -> str:
     """
     Like required_elements, but returns the elements as one conjoined string
 
@@ -168,10 +186,10 @@ def test_elements():
 
     print(generate_regex())
 
-    assert(len(Element.all_elements) == 118)
-    assert(len(Element.symbols_to_atomic_nums) == 118)
+    assert (len(Element.all_elements) == 118)
+    assert (len(Element.symbols_to_atomic_nums) == 118)
 
-    banned = 'oge'
+    banned = ''
 
     safes = Element.safe_elements(set(banned.lower()) | set(banned.upper()))
 
@@ -197,3 +215,5 @@ def test_elements():
 
 
 Element.load_elements_csv()
+
+test_elements()

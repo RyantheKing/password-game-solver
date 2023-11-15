@@ -141,3 +141,42 @@ driver.maximize_window()
 driver.get("https://neal.fun/password-game/")
 
 box = get_text_box()
+
+class Point:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+
+def find_lowest(vertices: list[Point]):
+    left = 0
+    right = len(vertices)
+
+    mid = (left + right) // 2
+
+    while left < right + 1:
+        mid = (left + right) // 2
+
+        left_cmp = vertices[left + 1].y - vertices[left].y
+        mid_cmp = vertices[mid + 1].y - vertices[mid].y
+
+        # both decreasing
+        if (left_cmp < 0 and mid_cmp < 0):
+            if vertices[left].y < vertices[mid].y:
+                right = mid
+            else:
+                left = mid + 1
+        # both increasing
+        elif (left_cmp > 0 and mid_cmp > 0):
+            if vertices[left].y > vertices[mid].y:
+                right = mid
+            else:
+                left = mid + 1
+        # only left decreasing
+        elif left_cmp < 0:
+            right = mid
+        # only mid decreasing
+        else:
+            left = mid + 1
+
+    return mid
