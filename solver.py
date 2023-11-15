@@ -53,13 +53,13 @@ def sum_25(password: str) -> str:
     return_str += str(diff)
     return return_str
 
-def get_element_string(password: str) -> str:
+def get_element_string(password: str, banned_chars='') -> str:
     """
     Gets the string of elements to add to the password to make a total atomic number of 200
     :param password: The password containing pre-existing elements
     :return: The string of elements to add to the password
     """
-    return elements.required_elements_str(200 - elements.password_element_sum(password))
+    return elements.required_elements_str(200 - elements.password_element_sum(password), banned_chars=banned_chars)
 
 def dot_string(password: str) -> str:
     """
@@ -88,7 +88,7 @@ def get_unused_letters(password: str) -> str:
     password_set = set(password.lower())
     return ''.join(sorted(alphabet_set - password_set))
 
-def generate_password(state=0, captcha='', location='', chess_move='', link='', color=''):
+def generate_password(state=0, captcha='', location='', chess_move='', link='', color='', unused_letters=''):
     """
     Generates the password for the given state and strings
     :param state: The state of the password (0-5)
@@ -102,18 +102,30 @@ def generate_password(state=0, captcha='', location='', chess_move='', link='', 
     match state:
         case 0:
              #data.paul + data.stronk + data.affirmation + data.smol_food +
-            return '101' + 'may' + 'XXXV' + 'sHell' + get_moon_phase()
+            password = '101' + 'may' + 'XXXV' + 'sHell' + get_moon_phase()
+            return password + sum_25(password)
         case 1:
-            return '101' + 'may' + 'XXXV' + 'sHell' + get_moon_phase() + captcha + get_wordle_answer()
+            password = '101' + 'may' + 'XXXV' + 'sHell' + get_moon_phase() + captcha + get_wordle_answer()
+            return password + sum_25(password)
         case 2:
-            return '101' + 'may' + '0' + 'XXXV' + 'sHell' + get_moon_phase() + captcha + get_wordle_answer() + location
+            password = '101' + 'may' + '0' + 'XXXV' + 'sHell' + get_moon_phase() + captcha + get_wordle_answer() + location
+            return password + sum_25(password)
         case 3:
-            return data.paul + data.smol_food + data.stronk + '101' + 'may' + '0' + data.affirmation + 'XXXV' + 'shell' + get_moon_phase() + captcha + get_wordle_answer() + location + chess_move
+            password = data.paul + data.smol_food + data.stronk + '101' + 'may' + '0' + data.affirmations[0] + 'XXXV' + 'shell' + get_moon_phase() + captcha + get_wordle_answer() + location + chess_move
+            return password + sum_25(password) + get_element_string(password)
         case 4:
-            return data.paul + data.smol_food + data.stronk + data.affirmation + get_moon_phase() + '101' + 'may' + 'shell' + '0' + 'XXXV' + captcha + get_wordle_answer() + location + chess_move + link
+            partial_password = get_wordle_answer() + location + chess_move
+            maximized_section = maximize_unused_letters(partial_password, captcha, link)
+            password = data.paul + data.smol_food + '0' + data.stronk + get_moon_phase() + '101' + maximized_section + get_wordle_answer() + location + chess_move
+            print(digit_sum(password+get_time()))
+            return password + sum_25(password) + get_element_string(password), password
         case 5:
-            return data.paul + data.smol_food + data.stronk + data.affirmation + get_moon_phase() + '101' + 'may' + 'shell' + '0' + 'XXXV' + captcha + get_wordle_answer() + get_time() + location + chess_move + link + color
-        
+            partial_password = get_wordle_answer() + location + chess_move
+            maximized_section = maximize_unused_letters(partial_password, captcha, link)
+            print(get_unused_letters(maximized_section+location+get_wordle_answer()+chess_move))
+            password = data.paul + data.smol_food + '0' + data.stronk + get_moon_phase() + '101' + maximized_section + get_wordle_answer() + get_time() + location + chess_move + color
+            return password + sum_25(password) + get_element_string(password, unused_letters)
+
 def password_to_html(state=0, password=''):
     """
     Converts the password to html
@@ -174,6 +186,19 @@ def password_to_html(state=0, password=''):
                     count += 1
                 return "arguments[0].innerHTML = '<p>" + modified + "</p>'"
         
+def maximize_unused_letters(letters, captcha, link):
+    letters_set = set(''.join(x for x in letters.lower() if x.isalpha()))
+    captcha_set = set(''.join(x for x in captcha.lower() if x.isalpha()))
+    link_set = set(''.join(x for x in link.lower() if x.isalpha()))
+    for affirmation in range(len(data.affirmation_sets)):
+        for sponsor in range(len(data.sponsors_sets)):
+            for month in range(len(data.month_sets)):
+                for roman in ['XXXV', 'VIIV']:
+                    if len(set('abcdefghijklmnopqrstuvwxyz')-(captcha_set|link_set|letters_set|data.affirmation_sets[affirmation]|data.sponsors_sets[sponsor]|data.month_sets[month]|set(roman.lower()))) >= 2:
+                        print(set('abcdefghijklmnopqrstuvwxyz')-(captcha_set|link_set|letters_set|data.affirmation_sets[affirmation]|data.sponsors_sets[sponsor]|data.month_sets[month]|set(roman.lower())))
+                        return data.affirmations[affirmation] + data.sponsors[sponsor] + data.months[month] + roman + captcha + link
+    print('WEE WOO OMEGA BAD')
+
 def get_moon_phase():
     mi = pylunar.MoonInfo((0,0,0),(0,0,0))
     EASTERN = pytz.timezone('US/Eastern')

@@ -87,7 +87,6 @@ def binary_search(arr: tuple[Element], query: int, right: int) -> int:
 
     return left - 1  # always return the underestimate
 
-
 def required_elements(required_sum: int, banned_chars: str = '') -> tuple[Element]:
     """
     Get the greedily shortest list of elements whose atomic numbers sum up to the requirement
