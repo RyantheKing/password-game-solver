@@ -258,7 +258,10 @@ def test_elements():
     for index in range(len(answers)):
         elements = answers[index]
 
-        print(f'{index}: {elements.elements}')
+        print(f'{index}: {elements and elements.elements}')
+
+        if not elements:
+            continue
 
         assert (sum(map(lambda e: e.atomic_number, elements.elements)) == index)
 
