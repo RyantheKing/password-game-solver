@@ -268,6 +268,7 @@ def test_elements():
             continue
 
         assert (sum(map(lambda e: e.atomic_number, elements.elements)) == index)
+        assert not elements.atomic_num_total or any(map(lambda e: len(e.symbol) == 2, elements.elements))
 
         if not most_chars or elements.char_count > most_chars.char_count:
             most_chars = elements
