@@ -29,7 +29,7 @@ class Element:
         :return: whether the number is safe
         """
 
-        return self.symbol[0] not in ROMAN_NUMERALS and not (self.characters & banned_chars)
+        return self.symbol[0] not in ROMAN_NUMERALS and not (banned_chars and (self.characters & banned_chars))
 
     @classmethod
     def load_elements_csv(cls):
@@ -250,9 +250,8 @@ def test_elements():
 
     answers = []
 
-    required_elements(420, banned_chars=banned, external_cache=answers)
+    required_elements(200, banned_chars=banned, external_cache=answers)
 
-    most_elements: ElementCombo | None = None
     most_chars: ElementCombo | None = None
     most_unique_chars: ElementCombo | None = None
 
@@ -263,9 +262,6 @@ def test_elements():
 
         assert (sum(map(lambda e: e.atomic_number, elements.elements)) == index)
 
-        if not most_elements or len(elements.elements) > len(most_elements.elements):
-            most_elements = elements
-
         if not most_chars or elements.char_count > most_chars.char_count:
             most_chars = elements
 
@@ -273,9 +269,9 @@ def test_elements():
             most_unique_chars = elements
 
     print()
-    print(f"Most elements: {most_elements.atomic_num_total} {most_elements.elements}")
     print(f"Most chars: {most_chars.atomic_num_total} {most_chars.elements}")
     print(f"Most unique chars: {most_unique_chars.atomic_num_total} {most_unique_chars.elements}")
+    print()
 
 
 Element.load_elements_csv()
