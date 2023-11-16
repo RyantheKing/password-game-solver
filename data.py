@@ -33,7 +33,7 @@ stronk = '🏋️‍♂️🏋️‍♂️🏋️‍♂️'
 affirmations = ['iamloved', 'iamworthy', 'iamenough']
 affirmation_sets = [{'o', 'm', 'a', 'i', 'l', 'v', 'd', 'e'}, {'o', 'm', 'a', 'i', 'h', 'r', 'y', 't', 'w'}, {'o', 'm', 'a', 'i', 'u', 'n', 'h', 'g', 'e'}]
 
-sponsors = ['sHell', 'pepSi', 'stArbucks']
+sponsors = ['shell', 'pepsi', 'starbucks']
 sponsors_sets = [{'s', 'h', 'e', 'l'}, {'p', 's', 'i', 'e'}, {'k', 't', 's', 'r', 'a', 'b', 'c', 'u'}]
 
 months = ['may', 'june', 'july', 'march', 'april', 'august', 'january', 'october', 'february', 'november', 'september', 'decemeber']

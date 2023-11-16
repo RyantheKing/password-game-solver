@@ -126,6 +126,10 @@ class ElementCombo:
         # return 0
         return set_1_len - set_2_len
 
+    @staticmethod
+    def valid_prospective_combo(combo: "ElementCombo", prospective: Element):
+        return combo.atomic_num_total or len(prospective.symbol) == 2
+
 
 def required_elements(required_sum: int, banned_chars: str = '', external_cache=None) -> ElementCombo:
     """
@@ -157,12 +161,12 @@ def coinChange(elements: tuple[Element], amount: int, external_cache=None):
         for element in elements:
             # deque size is limited to the value of the largest coin, cuz that's the farthest we have to look back
             storage_location = (end - element.atomic_number) % len(cache)
+            cached = cache[storage_location]
 
             if element.atomic_number <= target:
-                if cache[storage_location] is not None and \
-                        (minimum is None or ElementCombo.compare(cache[storage_location], element, minimum,
-                                                                 minimum_element) < 0):
-                    minimum = cache[storage_location]
+                if cached is not None and ElementCombo.valid_prospective_combo(cached, element) and \
+                        (minimum is None or ElementCombo.compare(cached, element, minimum, minimum_element) < 0):
+                    minimum = cached
                     minimum_element = element
             else:
                 break

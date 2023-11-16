@@ -123,7 +123,7 @@ def generate_password(state=0, captcha='', location='', chess_move='', link='', 
             password = '101' + 'may' + '0' + 'XXXV' + 'sHell' + get_moon_phase() + captcha + get_wordle_answer() + location
             return password + sum_25(password)
         case 3:
-            password = data.paul + data.smol_food + data.stronk + '101' + 'may' + '0' + data.affirmations[0] + 'XXXV' + 'sHell' + get_moon_phase() + captcha + get_wordle_answer() + location + chess_move
+            password = data.paul + data.smol_food + data.stronk + '101' + 'may' + '0' + data.affirmations[0] + 'XXXV' + 'shell' + get_moon_phase() + captcha + get_wordle_answer() + location + chess_move
             return password + sum_25(password) + get_element_string(password)
         case 4:
             partial_password = get_wordle_answer() + location + chess_move
