@@ -148,7 +148,7 @@ def required_elements(required_sum: int, banned_chars: str = '', external_cache=
 
 def coinChange(elements: tuple[Element], amount: int, external_cache=None):
     cache = [ElementCombo()]
-    largest_atomic_num = max(map(lambda e: e.atomic_number, elements))
+    largest_atomic_num = elements[-1].atomic_number
     end = 0
 
     if external_cache is not None:
