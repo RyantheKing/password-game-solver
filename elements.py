@@ -88,16 +88,43 @@ def binary_search(arr: tuple[Element], query: int, right: int) -> int:
     return left - 1  # always return the underestimate
 
 
+def space_efficient_union(og: set[str], new_set: set[str]):
+    if new_set <= og:
+        return og
+    else:
+        return new_set | og
+
+
 class ElementCombo:
-    def __init__(self, elements: tuple[Element, ...] = (), char_count=0):
+    def __init__(self, elements: tuple[Element, ...] = (), atomic_num_total=0, char_count=0, char_set=None):
         self.elements = elements
+        self.atomic_num_total = atomic_num_total
         self.char_count = char_count
+        self.char_set = char_set or set()
 
     def __add__(self, other: Element) -> "ElementCombo":
         if isinstance(other, Element):
-            return ElementCombo(elements=self.elements + (other,), char_count=self.char_count + len(other.symbol))
+            chars_union = space_efficient_union(self.char_set, other.characters)
+
+            return ElementCombo(elements=self.elements + (other,),
+                                atomic_num_total=self.atomic_num_total + other.atomic_number,
+                                char_count=self.char_count + len(other.symbol), char_set=chars_union)
 
         return NotImplemented
+
+    @staticmethod
+    def compare(combo_1: "ElementCombo", prospective_1: Element, combo_2: "ElementCombo", prospective_2: Element):
+        chars_1 = combo_1.char_count + len(prospective_1.symbol)
+        chars_2 = combo_2.char_count + len(prospective_2.symbol)
+
+        if chars_1 != chars_2:
+            return chars_1 - chars_2
+
+        set_1_len = len(space_efficient_union(combo_1.char_set, prospective_1.characters))
+        set_2_len = len(space_efficient_union(combo_2.char_set, prospective_2.characters))
+
+        # return 0
+        return set_1_len - set_2_len
 
 
 def required_elements(required_sum: int, banned_chars: str = '') -> ElementCombo:
@@ -129,8 +156,8 @@ def coinChange(elements: tuple[Element], amount: int):
 
             if element.atomic_number <= target:
                 if cache[storage_location] is not None and \
-                        (minimum is None or cache[storage_location].char_count + len(element.symbol) <
-                         minimum.char_count + len(minimum_element.symbol)):
+                        (minimum is None or ElementCombo.compare(cache[storage_location], element, minimum,
+                                                                 minimum_element) < 0):
                     minimum = cache[storage_location]
                     minimum_element = element
             else:
@@ -214,22 +241,32 @@ def test_elements():
 
     print()
 
-    longest = 0
+    most_elements: ElementCombo | None = None
+    most_chars: ElementCombo | None = None
+    most_unique_chars: ElementCombo | None = None
 
     for og_req in range(0, 201):
-        elements = required_elements(og_req, banned).elements
+        elements = required_elements(og_req, banned)
 
-        print(f'{og_req}: {elements}')
+        print(f'{og_req}: {elements.elements}')
 
-        assert (sum(map(lambda e: e.atomic_number, elements)) == og_req)
+        assert (sum(map(lambda e: e.atomic_number, elements.elements)) == og_req)
 
-        if len(elements) > longest:
-            longest = len(elements)
+        if not most_elements or len(elements.elements) > len(most_elements.elements):
+            most_elements = elements
+
+        if not most_chars or elements.char_count > most_chars.char_count:
+            most_chars = elements
+
+        if not most_unique_chars or len(elements.char_set) > len(most_unique_chars.char_set):
+            most_unique_chars = elements
 
     print()
-    print(longest)
+    print(f"Most elements: {most_elements.atomic_num_total} {most_elements.elements}")
+    print(f"Most chars: {most_chars.atomic_num_total} {most_chars.elements}")
+    print(f"Most unique chars: {most_unique_chars.atomic_num_total} {most_unique_chars.elements}")
 
 
 Element.load_elements_csv()
 
-# test_elements()
+test_elements()
