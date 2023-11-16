@@ -127,24 +127,28 @@ class ElementCombo:
         return set_1_len - set_2_len
 
 
-def required_elements(required_sum: int, banned_chars: str = '') -> ElementCombo:
+def required_elements(required_sum: int, banned_chars: str = '', external_cache=None) -> ElementCombo:
     """
     Get the greedily shortest list of elements whose atomic numbers sum up to the requirement
 
     :param required_sum: the sum that is required
     :param banned_chars: the banned characters; NOT case-sensitive
+    :param external_cache: an external cache that values will be stored in if provided
     :return: the list of elements to use to get to that sum
     """
 
     safes = Element.safe_elements(set(banned_chars.lower()) | set(banned_chars.upper()))
 
-    return coinChange(safes, required_sum)
+    return coinChange(safes, required_sum, external_cache=external_cache)
 
 
-def coinChange(elements: tuple[Element], amount: int):
+def coinChange(elements: tuple[Element], amount: int, external_cache=None):
     cache = [ElementCombo()]
     largest_atomic_num = max(map(lambda e: e.atomic_number, elements))
     end = 0
+
+    if external_cache is not None:
+        external_cache.append(cache[0])
 
     for target in range(1, amount + 1):
         minimum: ElementCombo | None = None
@@ -171,6 +175,9 @@ def coinChange(elements: tuple[Element], amount: int):
             end = (end + 1) % len(cache)
         else:
             cache.append(new_val)
+
+        if external_cache is not None:
+            external_cache.append(new_val)
 
     last_combo = cache[(end - 1) % len(cache)]
 
@@ -241,16 +248,20 @@ def test_elements():
 
     print()
 
+    answers = []
+
+    required_elements(420, banned_chars=banned, external_cache=answers)
+
     most_elements: ElementCombo | None = None
     most_chars: ElementCombo | None = None
     most_unique_chars: ElementCombo | None = None
 
-    for og_req in range(0, 201):
-        elements = required_elements(og_req, banned)
+    for index in range(len(answers)):
+        elements = answers[index]
 
-        print(f'{og_req}: {elements.elements}')
+        print(f'{index}: {elements.elements}')
 
-        assert (sum(map(lambda e: e.atomic_number, elements.elements)) == og_req)
+        assert (sum(map(lambda e: e.atomic_number, elements.elements)) == index)
 
         if not most_elements or len(elements.elements) > len(most_elements.elements):
             most_elements = elements
