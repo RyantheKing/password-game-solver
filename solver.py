@@ -53,13 +53,25 @@ def sum_25(password: str) -> str:
     return_str += str(diff)
     return return_str
 
+
 def get_element_string(password: str, banned_chars='') -> str:
     """
     Gets the string of elements to add to the password to make a total atomic number of 200
     :param password: The password containing pre-existing elements
     :return: The string of elements to add to the password
     """
-    return elements.required_elements_str(200 - elements.password_element_sum(password), banned_chars=banned_chars)
+
+    required_sum = 200 - elements.password_element_sum(password)
+
+    print(f"required element sum: {required_sum}")
+    print(f"banned chars: {banned_chars}")
+
+    answer = elements.required_elements_str(200 - elements.password_element_sum(password), banned_chars=banned_chars)
+
+    print(f"answer elements: {answer}")
+
+    return answer
+
 
 def dot_string(password: str) -> str:
     """
@@ -111,7 +123,7 @@ def generate_password(state=0, captcha='', location='', chess_move='', link='', 
             password = '101' + 'may' + '0' + 'XXXV' + 'sHell' + get_moon_phase() + captcha + get_wordle_answer() + location
             return password + sum_25(password)
         case 3:
-            password = data.paul + data.smol_food + data.stronk + '101' + 'may' + '0' + data.affirmations[0] + 'XXXV' + 'shell' + get_moon_phase() + captcha + get_wordle_answer() + location + chess_move
+            password = data.paul + data.smol_food + data.stronk + '101' + 'may' + '0' + data.affirmations[0] + 'XXXV' + 'sHell' + get_moon_phase() + captcha + get_wordle_answer() + location + chess_move
             return password + sum_25(password) + get_element_string(password)
         case 4:
             partial_password = get_wordle_answer() + location + chess_move

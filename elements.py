@@ -87,7 +87,20 @@ def binary_search(arr: tuple[Element], query: int, right: int) -> int:
 
     return left - 1  # always return the underestimate
 
-def required_elements(required_sum: int, banned_chars: str = '') -> tuple[Element]:
+
+class ElementCombo:
+    def __init__(self, elements: tuple[Element, ...] = (), char_count=0):
+        self.elements = elements
+        self.char_count = char_count
+
+    def __add__(self, other: Element) -> "ElementCombo":
+        if isinstance(other, Element):
+            return ElementCombo(elements=self.elements + (other,), char_count=self.char_count + len(other.symbol))
+
+        return NotImplemented
+
+
+def required_elements(required_sum: int, banned_chars: str = '') -> ElementCombo:
     """
     Get the greedily shortest list of elements whose atomic numbers sum up to the requirement
 
@@ -102,24 +115,28 @@ def required_elements(required_sum: int, banned_chars: str = '') -> tuple[Elemen
 
 
 def coinChange(elements: tuple[Element], amount: int):
-    cache = [()]
+    cache = [ElementCombo()]
     largest_atomic_num = max(map(lambda e: e.atomic_number, elements))
     end = 0
 
     for target in range(1, amount + 1):
-        minimum = None
-        minimum_element = None
+        minimum: ElementCombo | None = None
+        minimum_element: Element | None = None
 
         for element in elements:
             # deque size is limited to the value of the largest coin, cuz that's the farthest we have to look back
             storage_location = (end - element.atomic_number) % len(cache)
 
-            if element.atomic_number <= target and cache[storage_location] is not None and (
-                    minimum is None or len(cache[storage_location]) < len(minimum)):
-                minimum = cache[storage_location]
-                minimum_element = element
+            if element.atomic_number <= target:
+                if cache[storage_location] is not None and \
+                        (minimum is None or cache[storage_location].char_count + len(element.symbol) <
+                         minimum.char_count + len(minimum_element.symbol)):
+                    minimum = cache[storage_location]
+                    minimum_element = element
+            else:
+                break
 
-        new_val = minimum + (minimum_element,) if minimum is not None else None
+        new_val = minimum + minimum_element if minimum is not None else None
 
         # limit the size of the deque to the value of the largest coin
         if target >= largest_atomic_num:
@@ -142,7 +159,7 @@ def required_elements_str(required_sum: int, banned_chars: str = '') -> str:
     :return: the combined string of element symbols to use to get to that sum
     """
 
-    return ''.join(map(lambda element: element.symbol, required_elements(required_sum, banned_chars)))
+    return ''.join(map(lambda element: element.symbol, required_elements(required_sum, banned_chars).elements))
 
 
 def generate_regex() -> re.Pattern:
@@ -200,7 +217,7 @@ def test_elements():
     longest = 0
 
     for og_req in range(0, 201):
-        elements = required_elements(og_req, banned)
+        elements = required_elements(og_req, banned).elements
 
         print(f'{og_req}: {elements}')
 
@@ -215,4 +232,4 @@ def test_elements():
 
 Element.load_elements_csv()
 
-test_elements()
+# test_elements()
