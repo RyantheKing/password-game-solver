@@ -61,12 +61,14 @@ def get_element_string(password: str, banned_chars='') -> str:
     :return: The string of elements to add to the password
     """
 
-    required_sum = 200 - elements.password_element_sum(password)
+    existing_sum, found_two = elements.password_element_sum(password)
+    required_sum = 200 - existing_sum
 
     print(f"required element sum: {required_sum}")
+    print(f"already found 2-char element: {found_two}")
     print(f"banned chars: {banned_chars}")
 
-    answer = elements.required_elements_str(200 - elements.password_element_sum(password), banned_chars=banned_chars)
+    answer = elements.required_elements_str(required_sum, not found_two, banned_chars=banned_chars)
 
     print(f"answer elements: {answer}")
 

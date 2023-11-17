@@ -131,11 +131,13 @@ class ElementCombo:
         return combo.atomic_num_total or len(prospective.symbol) == 2
 
 
-def required_elements(required_sum: int, banned_chars: str = '', external_cache=None) -> ElementCombo:
+def required_elements(required_sum: int, req_two: bool, banned_chars: str = '', external_cache=None) -> \
+        ElementCombo:
     """
     Get the greedily shortest list of elements whose atomic numbers sum up to the requirement
 
     :param required_sum: the sum that is required
+    :param req_two: whether to require at least one two-character element
     :param banned_chars: the banned characters; NOT case-sensitive
     :param external_cache: an external cache that values will be stored in if provided
     :return: the list of elements to use to get to that sum
@@ -143,10 +145,10 @@ def required_elements(required_sum: int, banned_chars: str = '', external_cache=
 
     safes = Element.safe_elements(set(banned_chars.lower()) | set(banned_chars.upper()))
 
-    return coinChange(safes, required_sum, external_cache=external_cache)
+    return coinChange(safes, required_sum, req_two, external_cache=external_cache)
 
 
-def coinChange(elements: tuple[Element], amount: int, external_cache=None):
+def coinChange(elements: tuple[Element], amount: int, req_two: bool, external_cache=None):
     cache = [ElementCombo()]
     largest_atomic_num = elements[-1].atomic_number
     end = 0
@@ -164,8 +166,8 @@ def coinChange(elements: tuple[Element], amount: int, external_cache=None):
             cached = cache[storage_location]
 
             if element.atomic_number <= target:
-                if cached is not None and ElementCombo.valid_prospective_combo(cached, element) and \
-                        (minimum is None or ElementCombo.compare(cached, element, minimum, minimum_element) < 0):
+                if cached is not None and (not req_two or ElementCombo.valid_prospective_combo(cached, element)) \
+                        and (minimum is None or ElementCombo.compare(cached, element, minimum, minimum_element) < 0):
                     minimum = cached
                     minimum_element = element
             else:
@@ -188,16 +190,18 @@ def coinChange(elements: tuple[Element], amount: int, external_cache=None):
     return last_combo
 
 
-def required_elements_str(required_sum: int, banned_chars: str = '') -> str:
+def required_elements_str(required_sum: int, req_two: bool, banned_chars: str = '') -> str:
     """
     Like required_elements, but returns the elements as one conjoined string
 
     :param required_sum: the sum that is required
+    :param req_two: whether to require an element with 2 characters
     :param banned_chars: the banned characters; NOT case-sensitive
     :return: the combined string of element symbols to use to get to that sum
     """
 
-    return ''.join(map(lambda element: element.symbol, required_elements(required_sum, banned_chars).elements))
+    return ''.join(map(lambda element: element.symbol,
+                       required_elements(required_sum, req_two, banned_chars=banned_chars).elements))
 
 
 def generate_regex() -> re.Pattern:
@@ -219,18 +223,26 @@ def generate_regex() -> re.Pattern:
     return re.compile('|'.join(deque), flags=re.U)
 
 
-def password_element_sum(password: str) -> int:
+def password_element_sum(password: str) -> tuple[int, bool]:
     """
     Get the sum of all element symbols in the given password
 
-    :return: the sum
+    :return: the sum and whether a two-char element was found
     """
 
     regex = generate_regex()
     found = regex.findall(password)
     mapping = Element.symbols_to_atomic_nums
 
-    return sum(map(lambda symbol: mapping[symbol], found))
+    an_sum = 0
+    found_two = False
+
+    for symbol in found:
+        an_sum += mapping[symbol]
+
+        found_two = found_two or len(symbol) == 2
+
+    return an_sum, found_two
 
 
 def test_elements():
@@ -253,8 +265,9 @@ def test_elements():
     print()
 
     answers = []
+    req_two = False
 
-    required_elements(200, banned_chars=banned, external_cache=answers)
+    required_elements(200, req_two, banned_chars=banned, external_cache=answers)
 
     most_chars: ElementCombo | None = None
     most_unique_chars: ElementCombo | None = None
@@ -268,7 +281,7 @@ def test_elements():
             continue
 
         assert (sum(map(lambda e: e.atomic_number, elements.elements)) == index)
-        assert not elements.atomic_num_total or any(map(lambda e: len(e.symbol) == 2, elements.elements))
+        assert not req_two or not elements.atomic_num_total or any(map(lambda e: len(e.symbol) == 2, elements.elements))
 
         if not most_chars or elements.char_count > most_chars.char_count:
             most_chars = elements
