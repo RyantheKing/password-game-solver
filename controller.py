@@ -39,10 +39,15 @@ def get_captcha_answer() -> str:
     # sum of digits in answer
     total = sum([int(num) for num in answer if num.isdigit()])
     refresh = WebDriverWait(wrapper, 10).until(EC.element_to_be_clickable((By.CLASS_NAME, "captcha-refresh")))
-    while total > 0:
+    solutions = set()
+    for i in range(20000):
         click_button(refresh)
         answer = element.get_attribute("src").split("/")[-1].split(".")[0]
+        # add answer to set
+        solutions.add(answer)
         total = sum([int(num) for num in answer if num.isdigit()])
+    print(solutions)
+    print(len(solutions))
     return answer
 
 def get_location() -> str:
