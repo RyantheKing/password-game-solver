@@ -5,6 +5,16 @@ import requests
 from datetime import datetime
 from collections import defaultdict
 
+headers = {
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+    'Accept-Encoding': 'gzip, deflate, br',
+    'Accept-Language': 'en-US,en;q=0.5',
+    'Connection': 'keep-alive',
+    'Cookie': 'cf_clearance=17wK0Dk0.4zP8cHPy4DKOR5ymhLmsJPZybsgvpMauJo-1710387392-1.0.1.1-fRfrVORtyVNCeEaX8nGrJii3i0.ZSJoK_R22lZFvnf7b1cUeCg4KqpN5dBOk_hDaK6jS_Kl3f8J0_WOxJ_RWGQ; __cf_bm=AdwbQpimkA1AVtsXfH2umaBX1ooI2pZtdlG45Q2NQ30-1710388344-1.0.1.1-JF770ZF91AXuqLyOs12LURXEXdC8mK9qLw3RNUoz8dVF_pqkZhNONkXwiUk41DxGiin._EryBb.kBdFsWvwBmQ',
+    'Host': 'neal.fun',
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:123.0) Gecko/20100101 Firefox/123.0'
+}
+
 def birth_paul():
     '''
     And he called to him two of the centurions and said,
@@ -28,7 +38,7 @@ def get_wordle_answer() -> str:
     :return: The wordle answer
     """
     # uses requests library
-    response = requests.get("https://neal.fun/api/password-game/wordle?date=" + datetime.today().strftime("%Y-%m-%d"))
+    response = requests.get("https://neal.fun/api/password-game/wordle?date=" + datetime.today().strftime("%Y-%m-%d"), headers=headers)
     return response.json()['answer']
 
 def get_time():
