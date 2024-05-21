@@ -32,6 +32,6 @@ The bot will occasionally fail in scenarios where a solve is impossible. For exa
 90% of times, however, the bot will succeed, so just wait for a time with a lower digit sum and run it again.
 
 ## Credits
-Big thanks to not a cat ([GitHub page here](https://github.com/the-non-feline)) for his help with the code and testing of the project \
+Big thanks to [astral-carrier](https://github.com/astral-carrier) for his help with the code and testing of the project \
 YouTube video link database, chess answer database, and google maps answer database all by pog5 ([GitHub page here](https://github.com/pog5/)) \
 And thanks to [Neal Agarwal](https://nealagarwal.me/) for the game itself.
